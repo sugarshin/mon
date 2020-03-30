@@ -22,7 +22,7 @@ void Function(
   return (store, action, next) {
     next(action);
     next(LoadingAction());
-    buildsImpl.fetchRecent()
+    buildsImpl.fetchRecent(store.state.token)
       .then((BuildsDto dto) {
         next(FetchRecentBuildsSucceededAction(dto.builds));
       })

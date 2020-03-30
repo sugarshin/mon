@@ -4,6 +4,13 @@ class LoadCompleteAction {}
 
 class LoadingAction {}
 
+class LoginAction {
+  final String token;
+  const LoginAction(this.token);
+}
+
+class LogoutAction {}
+
 class FetchRecentBuildsAction {
   const FetchRecentBuildsAction();
 }

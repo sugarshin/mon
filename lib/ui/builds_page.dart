@@ -3,28 +3,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:mon/ui/builds_bloc.dart';
 import 'package:mon/model/build_entity.dart';
 import 'package:mon/store/state/app_state.dart';
 import 'package:mon/ui/widget/loading_widget.dart';
+import 'package:mon/store/action/actions.dart';
 
 class BuildsPage extends StatefulWidget {
   @override
   createState() {
-    return BuildsState();
+    return _BuildsState();
   }
 }
 
-class BuildsState extends State<BuildsPage> {
+class _BuildsState extends State<BuildsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Store<AppState> _store;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -36,27 +33,52 @@ class BuildsState extends State<BuildsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Scaffold(
-          appBar: AppBar(
-            title: Text('mon'),
-          ),
-          key: _scaffoldKey,
-          body: StoreConnector(
-              converter: _ViewModel.fromStore,
-              builder: (context, viewModel) {
-                var list = viewModel.builds;
-                return ListView.builder(
+    return StoreConnector<AppState, BuildsBloc>(
+      distinct: true,
+      onInit: (store) => store.dispatch(FetchRecentBuildsAction()),
+      converter: (store) {
+        return BuildsBloc(store);
+      },
+      builder: (context, bloc) {
+        return Stack(
+          children: <Widget>[
+            Scaffold(
+              appBar: AppBar(
+                title: Text('mon'),
+                actions: <Widget>[
+                  PopupMenuButton<String>(
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        PopupMenuItem(
+                          child: RaisedButton(
+                            child: Text('Logout'),
+                            onPressed: () {
+                              bloc.logout();
+                            }
+                          ),
+                        ),
+                      ];
+                    },
+                  )
+                ],
+              ),
+              key: _scaffoldKey,
+              body: StoreConnector(
+                converter: _ViewModel.fromStore,
+                builder: (context, viewModel) {
+                  var list = viewModel.builds;
+                  return ListView.builder(
                     padding: const EdgeInsets.all(16.0),
                     itemCount: list.length,
                     itemBuilder: (context, i) {
                       return _buildRow(list[i], viewModel);
                     });
-              }),
-        ),
-        LoadingWidget(),
-      ],
+                }),
+            ),
+            LoadingWidget(),
+          ],
+        );
+      },
     );
   }
 
@@ -66,12 +88,12 @@ class BuildsState extends State<BuildsPage> {
       child: Column(
         children: <Widget>[
           ListTile(
-              title: Text(
-                "#${entity.buildNum}: ${entity.username} / ${entity.reponame}",
-                style: _biggerFont,
-              ),
-              subtitle: Text(entity.subject)
+            title: Text(
+              "#${entity.buildNum}: ${entity.username} / ${entity.reponame}",
+              style: _biggerFont,
             ),
+            subtitle: Text(entity.subject ?? '')
+          ),
           Divider(),
         ],
       ),
