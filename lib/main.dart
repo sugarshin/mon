@@ -11,7 +11,7 @@ import 'package:mon/repository/builds_impl.dart';
 import 'package:mon/ui/builds_page.dart';
 
 void main() async {
-  await DotEnv().load('.env');
+  await DotEnv().load();
   runApp(Mon());
 }
 
