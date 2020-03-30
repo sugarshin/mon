@@ -39,7 +39,7 @@ class BuildEntity {
   final String subject;
 
   factory BuildEntity.fromJson(Map<String, dynamic> json) {
-    return  BuildEntity(
+    return BuildEntity(
       committerDate: json['committer_date'],
       body: json['body'],
       reponame: json['reponame'],

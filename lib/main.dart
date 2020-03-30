@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
+import 'package:redux_persist/redux_persist.dart';
+import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:mon/store/action/actions.dart';
 import 'package:mon/store/middleware/fetch_recent_builds_midleware.dart';
 import 'package:mon/store/reducer/app_state_reducer.dart';
@@ -12,17 +14,29 @@ import 'package:mon/ui/builds_page.dart';
 
 void main() async {
   await DotEnv().load();
-  runApp(Mon());
-}
 
-class Mon extends StatelessWidget {
-  static BuildsImpl buildsImpl = BuildsImpl();
+  BuildsImpl buildsImpl = BuildsImpl();
+
+  final persistor = Persistor<AppState>(
+    storage: FlutterStorage(),
+    serializer: JsonSerializer<AppState>(AppState.fromJson),
+  );
+
+  final initialState = await persistor.load();
 
   final store = Store<AppState>(
     appReducer,
-    initialState: AppState.loading(),
+    initialState: initialState ?? AppState.loading(),
     middleware: [fetchRecentBuildsMiddleware(buildsImpl), new LoggingMiddleware.printer()],
   );
+
+  runApp(Mon(store: store));
+}
+
+class Mon extends StatelessWidget {
+  final Store<AppState> store;
+
+  const Mon({Key key, this.store}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

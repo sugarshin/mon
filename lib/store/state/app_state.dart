@@ -23,6 +23,14 @@ class AppState {
     );
   }
 
+  static AppState fromJson(dynamic json) =>
+      AppState(
+        isLoading: json == null ? false : json['isLoading'],
+        builds: json == null ? [] : json['builds']
+      );
+
+  dynamic toJson() => {'counter': isLoading, 'builds': builds};
+
   @override
   int get hashCode => isLoading.hashCode ^ builds.hashCode;
 
