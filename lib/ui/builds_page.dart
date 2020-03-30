@@ -6,25 +6,21 @@ import 'package:redux/redux.dart';
 import 'package:mon/model/build_entity.dart';
 import 'package:mon/store/state/app_state.dart';
 import 'package:mon/ui/widget/loading_widget.dart';
+import 'package:mon/store/action/actions.dart';
 
 class BuildsPage extends StatefulWidget {
   @override
   createState() {
-    return BuildsState();
+    return _BuildsState();
   }
 }
 
-class BuildsState extends State<BuildsPage> {
+class _BuildsState extends State<BuildsPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Store<AppState> _store;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void didChangeDependencies() {
@@ -36,27 +32,34 @@ class BuildsState extends State<BuildsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Scaffold(
-          appBar: AppBar(
-            title: Text('mon'),
-          ),
-          key: _scaffoldKey,
-          body: StoreConnector(
-              converter: _ViewModel.fromStore,
-              builder: (context, viewModel) {
-                var list = viewModel.builds;
-                return ListView.builder(
+    return StoreConnector<AppState, bool>(
+      distinct: true,
+      onInit: (store) => store.dispatch(FetchRecentBuildsAction()),
+      converter: (store) => true,
+      builder: (context, _) {
+        return Stack(
+          children: <Widget>[
+            Scaffold(
+              appBar: AppBar(
+                title: Text('mon'),
+              ),
+              key: _scaffoldKey,
+              body: StoreConnector(
+                converter: _ViewModel.fromStore,
+                builder: (context, viewModel) {
+                  var list = viewModel.builds;
+                  return ListView.builder(
                     padding: const EdgeInsets.all(16.0),
                     itemCount: list.length,
                     itemBuilder: (context, i) {
                       return _buildRow(list[i], viewModel);
                     });
-              }),
-        ),
-        LoadingWidget(),
-      ],
+                }),
+            ),
+            LoadingWidget(),
+          ],
+        );
+      },
     );
   }
 
@@ -70,7 +73,7 @@ class BuildsState extends State<BuildsPage> {
                 "#${entity.buildNum}: ${entity.username} / ${entity.reponame}",
                 style: _biggerFont,
               ),
-              subtitle: Text(entity.subject)
+              subtitle: Text(entity.subject ?? '')
             ),
           Divider(),
         ],
