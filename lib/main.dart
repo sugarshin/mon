@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_navigation/flutter_redux_navigation.dart';
+import 'package:mon/store/middleware/authentication_midleware.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_logging/redux_logging.dart';
 import 'package:redux_persist/redux_persist.dart';
@@ -28,8 +29,12 @@ void main() async {
   final store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState.loading(),
-    middleware: [NavigationMiddleware(), fetchRecentBuildsMiddleware(buildsImpl), new LoggingMiddleware.printer()],
+    middleware: [NavigationMiddleware(), authenticationMiddleware(), fetchRecentBuildsMiddleware(buildsImpl), new LoggingMiddleware.printer()],
   );
+
+  if (initialState.token != '') {
+    store.dispatch(NavigateToAction.replace('/builds'));
+  }
 
   runApp(Mon(store: store));
 }

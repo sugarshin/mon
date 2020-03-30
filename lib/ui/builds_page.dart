@@ -69,12 +69,12 @@ class _BuildsState extends State<BuildsPage> {
       child: Column(
         children: <Widget>[
           ListTile(
-              title: Text(
-                "#${entity.buildNum}: ${entity.username} / ${entity.reponame}",
-                style: _biggerFont,
-              ),
-              subtitle: Text(entity.subject ?? '')
+            title: Text(
+              "#${entity.buildNum}: ${entity.username} / ${entity.reponame}",
+              style: _biggerFont,
             ),
+            subtitle: Text(entity.subject ?? '')
+          ),
           Divider(),
         ],
       ),

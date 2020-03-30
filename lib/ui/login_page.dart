@@ -9,6 +9,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, LoginBloc>(
@@ -22,11 +25,39 @@ class _LoginPageState extends State<LoginPage> {
             ),
             body: Builder(
               builder: (BuildContext context) {
-                return Container(
-                  alignment: Alignment.center,
-                  child: RaisedButton(
-                    onPressed: bloc.login,
-                    child: Text('Login'),
+                return Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        obscureText: true,
+                        style: style,
+                        validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Please enter your token';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                          labelText: 'Personal Token',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))
+                        ),
+                        onSaved: (value) {
+                          bloc.login(value);
+                        },
+                      ),
+                      RaisedButton(
+                        onPressed: () {
+                           if (_formKey.currentState.validate()) {
+                            this._formKey.currentState.save();
+                          }
+                        },
+                        child: Text('Login'),
+                      ),
+                    ],
                   ),
                 );
               },
