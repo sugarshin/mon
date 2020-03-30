@@ -7,7 +7,18 @@ Middleware<AppState> authenticationMiddleware() {
   return TypedMiddleware<AppState, LoginAction>((store, action, next) {
     next(action);
     if (action.token != '') {
-      store.dispatch(NavigateToAction.replace('/builds'));
+      store.dispatch(NavigateToAction.push('/builds'));
     }
+  });
+}
+
+Middleware<AppState> logoutMiddleware() {
+  return TypedMiddleware<AppState, LogoutAction>((store, action, next) {
+    next(action);
+    store.dispatch(NavigateToAction.popUntil(
+      predicate: (route) {
+        return route.settings.name == '/';
+      }
+    ));
   });
 }

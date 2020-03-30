@@ -47,6 +47,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         onSaved: (value) {
                           bloc.login(value);
+                          this._formKey.currentState..reset();
                         },
                       ),
                       RaisedButton(

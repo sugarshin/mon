@@ -29,7 +29,7 @@ void main() async {
   final store = Store<AppState>(
     appReducer,
     initialState: initialState ?? AppState.loading(),
-    middleware: [NavigationMiddleware(), authenticationMiddleware(), fetchRecentBuildsMiddleware(buildsImpl), new LoggingMiddleware.printer()],
+    middleware: [NavigationMiddleware(), authenticationMiddleware(), logoutMiddleware(), fetchRecentBuildsMiddleware(buildsImpl), new LoggingMiddleware.printer()],
   );
 
   if (initialState.token != '') {

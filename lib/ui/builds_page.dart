@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:mon/ui/builds_bloc.dart';
 import 'package:mon/model/build_entity.dart';
 import 'package:mon/store/state/app_state.dart';
 import 'package:mon/ui/widget/loading_widget.dart';
@@ -32,16 +33,34 @@ class _BuildsState extends State<BuildsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, bool>(
+    return StoreConnector<AppState, BuildsBloc>(
       distinct: true,
       onInit: (store) => store.dispatch(FetchRecentBuildsAction()),
-      converter: (store) => true,
-      builder: (context, _) {
+      converter: (store) {
+        return BuildsBloc(store);
+      },
+      builder: (context, bloc) {
         return Stack(
           children: <Widget>[
             Scaffold(
               appBar: AppBar(
                 title: Text('mon'),
+                actions: <Widget>[
+                  PopupMenuButton<String>(
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        PopupMenuItem(
+                          child: RaisedButton(
+                            child: Text('Logout'),
+                            onPressed: () {
+                              bloc.logout();
+                            }
+                          ),
+                        ),
+                      ];
+                    },
+                  )
+                ],
               ),
               key: _scaffoldKey,
               body: StoreConnector(
